@@ -1,34 +1,43 @@
 local skynet = require "skynet"
 local timetool = require "timetool" 
+local json = require "cjson"
+local sproto = require "sproto"
+
+
 local gate
 local CMD = {}
 local SOCKET = {}
 local agents = {}
 
-local function close_agent(fd)
-	skynet.error("--close_agent---",fd)
-	skynet.send(agents[fd], "lua", "close_agent",fd)
+
+function close(fd)
+
+	local a = agents[fd]
 	agents[fd] = nil
+	if a then
+		skynet.call(gate, "lua", "kick", fd)
+		-- disconnect never return
+		skynet.send(a, "lua", "kick")
+	end
 end
 
 function SOCKET.open(fd, addr)
-	-- agents[fd] = {
-	-- 	agent = skynet.newservice("agent"),
-	-- 	time = timetool.get_time(),
-	-- }
-	-- skynet.send(agents[fd].agent, "lua", "open_agent",fd, addr)
 	skynet.error("New client from : ", fd, addr)
 	skynet.send(gate, 'lua', 'accept', fd)
+
+	--发送到对应玩家上面
+	agents[fd] = skynet.newservice("agent")
+	skynet.call(agents[fd], "lua", "start", { gate = gate, fd = fd, watchdog = skynet.self() })
 end
 
 function SOCKET.close(fd)
 	skynet.error("---SOCKET.close---", fd)
-	skynet.call(gate, "lua", "kick", fd)
+	close(fd)
 end
 
 function SOCKET.error(fd, msg)
 	skynet.error("socket error",fd, msg)
-	skynet.call(gate, "lua", "kick", fd)
+	close(fd)
 end
 
 function SOCKET.warning(fd, size)
@@ -36,7 +45,8 @@ function SOCKET.warning(fd, size)
 end
 
 function SOCKET.data(fd, msg)
-	skynet.error("---SOCKET.data---", fd, "msg:",msg)
+	local msg_data = json.decode(msg)
+	skynet.error("msg:",msg_data.Name, msg_data.Age)
 end
 
 function CMD.start(conf)
@@ -44,18 +54,13 @@ function CMD.start(conf)
 end
 
 function CMD.close(fd)
-	close_agent(fd)
+	skynet.error("socket close", fd)
+	close(fd)
 end
 
-function check_alive()
-	while true do
-		skynet.sleep(400)
-		now_time = timetool.get_time()
-	end
-end
 
 skynet.start(function()
-
+	--解析
 	skynet.dispatch("lua", function(session, source, cmd, subcmd, ...)
 		if cmd == "socket" then
 			local f = SOCKET[subcmd]
@@ -66,7 +71,7 @@ skynet.start(function()
 		end
 	end)
 
-	gate = skynet.newservice("wsgate")
+	gate = skynet.newservice("gate")
 end)
 
 
