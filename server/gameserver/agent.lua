@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local socket = require "socket"
 local json = require "cjson"
-local route_handler = require ("route_handler")
+local player = require "player"
 
 local Agent = {
 	gate = 0,
@@ -15,6 +15,8 @@ function Agent.start(conf)
 	Agent.watchdog = conf.watchdog
 
 	skynet.error("Agent.fd, skynet.self()", Agent.fd, skynet.self())
+	player.init(Agent.fd, Agent.gate, Agent.watchdog) --初始化
+
 	skynet.call(Agent.gate, "lua", "forward", Agent.fd)
 end
 
@@ -47,7 +49,7 @@ function process_client_message(session, source, ...)
 	
 	local head = json.decode(msghead)
 	
-	local f = route_handler[head.MessaegName]
+	local f = player[head.MessaegName]
 	if f == nil then
 		skynet.error("head.MessaegName:%s not found",head.MessaegName)
 		return

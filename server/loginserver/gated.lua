@@ -7,7 +7,6 @@ local agents = {}
 
 
 function close(fd)
-
 	local a = agents[fd]
 	agents[fd] = nil
 	if a then

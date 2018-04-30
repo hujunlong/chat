@@ -53,6 +53,13 @@ function CMD.close(fd)
 	close(fd)
 end
 
+--广播数据
+function CMD.broadcast_info(msg_name, args)
+	for fd,agent in pairs(agents) do
+		skynet.send(agent, "lua", "BroadCastNtc", msg_name, args)
+	end
+end
+
 
 skynet.start(function()
 	--解析

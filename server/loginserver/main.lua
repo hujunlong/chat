@@ -6,7 +6,6 @@ local gate_conf = {
 	port = 8887,
 	maxclient = 1024,
 	nodelay = true,
-	db = 1,
 }
 
  skynet.start(function()

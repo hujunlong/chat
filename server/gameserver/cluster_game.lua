@@ -2,8 +2,17 @@ local skynet = require "skynet"
 require "skynet.manager"
 local command = {}
 
-function command.login(args)
-	skynet.error("---command.login---",args.UserName)
+local cluster_info = {}
+
+function command.login(addr_info, args)
+	skynet.error("---command.login---",args.UserName, args.Rid)
+	local rid = args.Rid 
+	cluster_info[rid] = args
+	--todo 记录登录时间
+end
+
+function command.get_notice_info_by_login(rid)
+	return cluster_info[rid]
 end
 
 skynet.start(function()

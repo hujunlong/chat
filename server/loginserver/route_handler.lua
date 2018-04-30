@@ -32,7 +32,8 @@ function Route.RegisterReq(fd, args)
 		--通知gate服务器
 		local proxy = cluster.proxy("cluster_game_1", "cluster_game")
 		skynet.send(proxy, "lua", "login", data)
-		skynet.error("11111111")
+
+		--todo主动断开需要处理事件
 	end
 	
 	send_2_client(fd, "RegisterResult", RegisterResult)

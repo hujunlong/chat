@@ -21,10 +21,37 @@ LoginResult = {
 	Rid = 0,--注册的rid
 }
 
-GetChatListReq = {
+------------------------
+EnterGameReq = {
 	Rid = 0,
 }
 
-GetChatListRes = {
+EnterGameRes = {
+	Status = 0,--0:ok 1:账号服务器未通知
+}
+
+--聊天列表
+ChatListReq = {
+	Rid = 0,
+}
+
+ChatListRes = {
 	MsgList = {},
 }
+
+--聊天
+ChatReq = {
+	Rid = 0,
+	Msg = "",
+}
+
+ChatRes = {
+	Status = 0, --成功
+}
+
+ChatNtc = {
+	rid = 0,
+	UserName = "",
+	Msg = "",
+}
+
