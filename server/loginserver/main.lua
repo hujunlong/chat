@@ -1,19 +1,22 @@
 local skynet = require "skynet"
-local cluster = require "cluster"
 
-skynet.start(function()
 
-	local proxy = cluster.proxy("db","redis")
-	skynet.send(proxy,"lua","save_player",1,{aa="12"})
+local gate_conf = {
+	address = "127.0.0.1", -- 监听地址 127.0.0.1
+	port = 8887,
+	maxclient = 1024,
+	nodelay = true,
+	db = 1,
+}
 
-	--[[
-	local loginserver = skynet.newservice("logind")
-	local gate = skynet.newservice("gated", loginserver)
+ skynet.start(function()
+ 	--redis
+ 	local redis = skynet.newservice("redis")
+ 	pcall(skynet.send, redis, "lua", "connet")
+ 	
+ 	--gate
+	local gateserver = skynet.newservice("gated")
+	pcall(skynet.send, gateserver, "lua","start",gate_conf)
 
-	skynet.call(gate, "lua", "open" , {
-		port = 8888,
-		maxclient = 64,
-		servername = "sample",
-	})
-	--]]
+	skynet.exit()
 end)

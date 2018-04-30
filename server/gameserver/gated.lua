@@ -1,8 +1,4 @@
 local skynet = require "skynet"
-local timetool = require "timetool" 
-local json = require "cjson"
-local sproto = require "sproto"
-
 
 local gate
 local CMD = {}
@@ -45,8 +41,7 @@ function SOCKET.warning(fd, size)
 end
 
 function SOCKET.data(fd, msg)
-	local msg_data = json.decode(msg)
-	skynet.error("msg:",msg_data.Name, msg_data.Age)
+	skynet.error("msg:",msg)
 end
 
 function CMD.start(conf)

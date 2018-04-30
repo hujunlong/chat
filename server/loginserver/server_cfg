@@ -5,11 +5,13 @@ logpath = "."
 harbor = 0
 start = "main"	-- main script
 bootstrap = "snlua bootstrap"	-- The service for bootstrap
-luaservice = root.."service/?.lua;".."./?.lua"
+luaservice = root.."service/?.lua;".."./?.lua;" .. "../common/?.lua;" 
 lualoader = root.."lualib/loader.lua"
-snax = root.."examples/?.lua;"..root.."test/?.lua"
+snax = root.."examples/?.lua;"
 cpath = root.."cservice/?.so"
-lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua"
+lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;" .. "../common/?.lua;" .. "./?.lua;"
 lua_cpath = root .. "luaclib/?.so"
 
-cluster = "./clustername.lua"
+cluster = "../common/clustername.lua"
+
+db_connet_num = 10

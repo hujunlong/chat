@@ -1,9 +1,9 @@
 local skynet = require "skynet"
-local socket = require "socket"
 local json = require "cjson"
-local route_handler = require ("route_handler")
+local route_handler = require "route_handler"
 
 local Agent = {
+
 	gate = 0,
 	fd = 0,
 	watchdog = 0,
@@ -53,7 +53,7 @@ function process_client_message(session, source, ...)
 		return
 	end
 
-	f(json.decode(msgbody))
+	f(Agent.fd, json.decode(msgbody))
 end
 
 --注册解析消息
