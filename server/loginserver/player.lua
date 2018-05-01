@@ -4,7 +4,7 @@ local json = require "cjson"
 local msg = require "msg"
 local cluster = require "cluster"
 
-local Route = {
+local Player = {
 }
 
 function send_2_client(fd, package_name, data)
@@ -19,7 +19,7 @@ function send_2_client(fd, package_name, data)
 	socket.write(fd, total_package)
 end
 
-function Route.RegisterReq(fd, args)
+function Player.RegisterReq(fd, args)
 	local data = skynet.call("redis","lua", "query_data_by_username", args.UserName)
 	if data == nil then
 		skynet.send("redis","lua", "save_data_by_username", args.UserName, args)
@@ -33,7 +33,7 @@ function Route.RegisterReq(fd, args)
 	send_2_client(fd, "RegisterResult", RegisterResult)
 end
 
-function Route.LoginReq(fd, args)
+function Player.LoginReq(fd, args)
 	local data = skynet.call("redis","lua", "query_data_by_username", args.UserName)
 	if data ~= nil then
 		if (data.UserName == args.UserName) and (data.Pwd == args.Pwd) then
@@ -56,4 +56,4 @@ function Route.LoginReq(fd, args)
 	send_2_client(fd, "LoginResult", RegisterResult)
 end
 
-return Route
+return Player

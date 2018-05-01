@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local json = require "cjson"
-local route_handler = require "route_handler"
+local player = require "player"
 
 local Agent = {
 
@@ -47,7 +47,7 @@ function process_client_message(session, source, ...)
 	
 	local head = json.decode(msghead)
 	
-	local f = route_handler[head.MessaegName]
+	local f = player[head.MessaegName]
 	if f == nil then
 		skynet.error("head.MessaegName:%s not found",head.MessaegName)
 		return
