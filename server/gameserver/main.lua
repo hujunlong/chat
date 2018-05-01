@@ -17,6 +17,8 @@ local gate_conf = {
  skynet.start(function()
  	--开启进程间通信
  	deal_cluster()
+
+ 	skynet.newservice("chat")
 	local gateserver = skynet.newservice("gated")
 	pcall(skynet.send, gateserver, "lua","start",gate_conf)
 

@@ -4,7 +4,7 @@ local command = {}
 
 local cluster_info = {}
 
-function command.login(addr_info, args)
+function command.login(args)
 	skynet.error("---command.login---",args.UserName, args.Rid)
 	local rid = args.Rid 
 	cluster_info[rid] = args

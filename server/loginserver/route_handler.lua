@@ -28,12 +28,6 @@ function Route.RegisterReq(fd, args)
 	else
 		RegisterResult.status = 1
 		skynet.error("status:",RegisterResult.status)
-
-		--通知gate服务器
-		local proxy = cluster.proxy("cluster_game_1", "cluster_game")
-		skynet.send(proxy, "lua", "login", data)
-
-		--todo主动断开需要处理事件
 	end
 	
 	send_2_client(fd, "RegisterResult", RegisterResult)
@@ -46,10 +40,12 @@ function Route.LoginReq(fd, args)
 			LoginResult.status = 0
 			LoginResult.Rid = data.Rid
 
+			skynet.error("---LoginReq---", data.Rid, data.UserName, data.Pwd)
 			--通知gate服务器
-			local proxy = cluster.proxy("cluster_game_1", ".cluster_game")
+			local proxy = cluster.proxy("cluster_game_1", "cluster_game")
 			skynet.send(proxy, "lua", "login", data)
 
+			--todo 需要断开处理
 		else
 			LoginResult.status = 1
 		end

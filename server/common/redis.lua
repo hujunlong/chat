@@ -43,9 +43,9 @@ function CMD.query_data_by_rid(rid)
 end
 
 function CMD.save_data_by_username(username, data)
-	data.rid = CMD.get_new_rid()
+	data.Rid = CMD.get_new_rid()
 	skynet.error("-----save_data_by_username------", username, json.encode(data))
-	local db = CMD.get_connet(data.rid)
+	local db = CMD.get_connet(data.Rid)
 	db:set("UserName:"..username, json.encode(data) )
 end
 

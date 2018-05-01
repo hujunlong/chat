@@ -50,7 +50,7 @@ ChatRes = {
 }
 
 ChatNtc = {
-	rid = 0,
+	Rid = 0,
 	UserName = "",
 	Msg = "",
 }

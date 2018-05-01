@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+local player = require "player"
 
 local gate
 local CMD = {}
@@ -55,11 +56,11 @@ end
 
 --广播数据
 function CMD.broadcast_info(msg_name, args)
-	for fd,agent in pairs(agents) do
-		skynet.send(agent, "lua", "BroadCastNtc", msg_name, args)
+	skynet.error("---broadcast_info----",msg_name, args)
+	for fd,_ in pairs(agents) do
+		player.BroadCastNtc(fd, msg_name, args)
 	end
 end
-
 
 skynet.start(function()
 	--解析

@@ -48,11 +48,12 @@ function Player.ChatListReq(args)
 	send_2_client(Player.fd, "ChatListRes", ChatListRes)
 end
 
-function Player.BroadCastNtc(msg_name, args)
+function Player.BroadCastNtc(fd, msg_name, args)
+	skynet.error("---BroadCastNtc---", msg_name, args)
 	if msg_name == "ChatNtc" then
-		ChatNtc.rid = args.Rid
-		ChatNtc.Msg = arg.Msg
-		send_2_client(Player.fd, msg_name, ChatNtc)
+		ChatNtc.Rid = args.Rid
+		ChatNtc.Msg = args.Msg
+		send_2_client(fd, msg_name, ChatNtc)
 	end
 end
 
