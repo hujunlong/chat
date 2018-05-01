@@ -14,8 +14,8 @@ local gate_conf = {
  	pcall(skynet.send, redis, "lua", "connet")
  	
  	--gate
-	local gateserver = skynet.newservice("gated")
-	pcall(skynet.send, gateserver, "lua","start",gate_conf)
+	local watchdog = skynet.newservice("watchdog")
+	pcall(skynet.send, watchdog, "lua","start",gate_conf)
 
 	skynet.exit()
 end)
