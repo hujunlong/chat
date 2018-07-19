@@ -19,6 +19,7 @@ LoginReq = {
 LoginResult = {
 	Status = 0,--0:ok 1:用户名与密码不匹配 2:该账户未注册
 	Rid = 0,--注册的rid
+	token = "",
 }
 
 ------------------------

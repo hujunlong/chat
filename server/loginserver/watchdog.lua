@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+require "skynet.manager"
 
 local gate
 local CMD = {}
@@ -6,7 +7,7 @@ local SOCKET = {}
 local agents = {}
 
 
-function close(fd)
+local function close(fd)
 	local a = agents[fd]
 	agents[fd] = nil
 	if a then
@@ -65,6 +66,7 @@ skynet.start(function()
 		end
 	end)
 
+	skynet.register("watchdog")
 	gate = skynet.newservice("gate")
 end)
 
