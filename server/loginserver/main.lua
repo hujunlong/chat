@@ -15,10 +15,10 @@ local conf = {
 
  skynet.start(function()
  	--开启日志
- 	skynet.newservice("loggerserver")
+ 	skynet.newservice("loggerservice")
 
  	--开启db
- 	local db_manager = skynet.newservice("dbmanagerserver")
+ 	local db_manager = skynet.newservice("dbmanagerservice")
  	pcall(skynet.send, db_manager, "lua", "start", conf)
 
  	--gate

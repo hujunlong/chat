@@ -1,7 +1,7 @@
 local skynet = require "skynet"
-local socket = require "socket"
 local json = require "cjson"
 local player = require "player"
+local filelog = require "filelog"
 
 local Agent = {
 	gate = 0,
@@ -14,7 +14,8 @@ function Agent.start(conf)
 	Agent.gate = conf.gate
 	Agent.watchdog = conf.watchdog
 
-	skynet.error("Agent.fd, skynet.self()", Agent.fd, skynet.self())
+	filelog.sys_info("Agent.fd, skynet.self()", Agent.fd, skynet.self())
+
 	player.init(Agent.fd, Agent.gate, Agent.watchdog) --初始化
 
 	skynet.call(Agent.gate, "lua", "forward", Agent.fd)
@@ -24,8 +25,21 @@ function Agent.kick()
 	skynet.exit()
 end
 
+function Agent.broadcast_info(fd, msg_name, args)
+	local f = player["broadcast_info"]
+	if f == nil then
+		filelog.sys_error("broadcast_info head.MessaegName:%s not found",fd, msg_name,args)
+		return
+	end
+
+	local status, data = pcall(f, fd, msg_name, args)
+	if not status then
+		filelog.stack_traceback("input:", msg_name, args, "err msg:", data)
+	end
+end
+
 --int16总长度(不含总长度自己的2字节长度) + int16(包头长度) + (包头数据) + (具体数据)
-function unpack_client_message( ... )
+local function unpack_client_message( ... )
 	local msgbuf, msgsize = ...
 	skynet.error("msgbuf", msgbuf, "msgsize",msgsize)
 	 
@@ -43,19 +57,22 @@ function unpack_client_message( ... )
 	return msghead, msgbody
 end
 
-function process_client_message(session, source, ...)
+local function process_client_message(session, source, ...)
 	local msghead, msgbody = ... 
-	skynet.error("msghead, msgbody:",msghead, msgbody)
-	
 	local head = json.decode(msghead)
 	
 	local f = player[head.MessaegName]
 	if f == nil then
-		skynet.error("head.MessaegName:%s not found",head.MessaegName)
+		filelog.sys_error("head.MessaegName not found:",head.MessaegName)
 		return
 	end
 
-	f(json.decode(msgbody))
+	--记录消息日志
+	filelog.sys_protomsg(head.MessaegName, json.decode(msgbody))
+	local status, data = pcall(f, json.decode(msgbody))
+	if not status then
+		filelog.stack_traceback("input:", head.MessaegName, json.decode(msgbody), "err msg:", data)
+	end
 end
 
 --注册解析消息
@@ -69,6 +86,9 @@ skynet.register_protocol {
 skynet.start(function()
 	skynet.dispatch("lua", function(_,_, command, ...)
 		local f = Agent[command]
+		if f == nil then
+			filelog.sys_error("agent:", command, ...)
+		end 
 		skynet.ret(skynet.pack(f(...)))
 	end)
 end)

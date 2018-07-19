@@ -44,7 +44,6 @@ function utility.dump(obj)
     return dumpObj(obj, 0)
 end
 
-
 function utility.is_file_exist(path)
   local file = io.open(path, "rb")
   if file then file:close() end

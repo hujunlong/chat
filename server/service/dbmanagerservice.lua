@@ -65,13 +65,13 @@ end
 
 
 skynet.start(function()
+	skynet.register(".dbmanagerservice")
 	--解析
 	skynet.dispatch("lua", function(session, source, cmd, ...)
 		local f = assert(DbManager[cmd])
 		skynet.ret(skynet.pack(f(...)))
 	end)
 
-	skynet.register(SERVICE_NAME)
 end)
 
 

@@ -1,24 +1,19 @@
 local skynet = require "skynet"
-local cluster = require "cluster"
-
-
-function deal_cluster()
-	skynet.newservice("cluster_game")
-	cluster.open "cluster_game_1"
-end
 
 local gate_conf = {
-	address = "127.0.0.1", -- 监听地址 127.0.0.1
+	address = "192.168.0.38", -- 监听地址 127.0.0.1
 	port = 8888,
 	maxclient = 1024,
 	nodelay = true,
 }
 
  skynet.start(function()
- 	--开启进程间通信
- 	deal_cluster()
+ 	--开启日志
+ 	skynet.newservice("loggerservice")
 
- 	skynet.newservice("chat")
+ 	--开启聊天服务
+ 	skynet.newservice("chatservice")
+ 	
 	local watchdog = skynet.newservice("watchdog")
 	pcall(skynet.send, watchdog, "lua","start",gate_conf)
 

@@ -1,7 +1,18 @@
 local skynet = require "skynet"
 local socket = require "socket"
 local json = require "cjson"
-local msg = require "msg"
+local filelog = require "filelog"
+local md5 = require "md5"
+require "msg"
+require "enum"
+
+local Head = Head
+local EnterGameRes = EnterGameRes
+local ChatListRes = ChatListRes
+local ChatNtc = ChatNtc
+local ChatRes = ChatRes
+
+local EErrCode = EErrCode
 
 local Player = {
 	Rid  = 0,
@@ -10,7 +21,10 @@ local Player = {
 	watchdog = 0,
 }
 
-function send_2_client(fd, package_name, data)
+local function send_2_client(fd, package_name, data)
+	--记录日志
+	filelog.sys_protomsg(package_name, data)
+	
 	Head.MessaegName = package_name
 	local encode_head_msg = json.encode(Head)
 	local encode_body_msg = json.encode(data)
@@ -30,26 +44,38 @@ end
 
 
 function Player.EnterGameReq(args)
-	local login_info = skynet.call("cluster_game", "lua", "get_notice_info_by_login", args.Rid)
-	if login_info == nil then
-		EnterGameRes.Status = 1 
-	else
-		EnterGameRes.Status = 0
-		Player.Rid = login_info.Rid
+	if args.Rid == nil or args.Token == nil then
+		EnterGameRes.Errcode = EErrCode.ERR_INVALID_REQUEST
+		EnterGameRes.Errcodedes = "参数请求不全"
+		send_2_client(Player.fd, "EnterGameRes", EnterGameRes)
+		--断开连接
+		skynet.send("watchdog", "lua", "socket", "close", Player.fd)
+		return
 	end
+
+	if md5.sumhexa(tostring(args.Rid)) ~= args.Token then
+		EnterGameRes.Errcode = EErrCode.ERR_VERIFYTOKEN_FAILED
+		EnterGameRes.Errcodedes = "token 验证失败"
+		send_2_client(Player.fd, "EnterGameRes", EnterGameRes)
+		--断开连接
+		skynet.send("watchdog", "lua", "socket", "close", Player.fd)
+		filelog.sys_error("---Player.EnterGameReq---", md5.sumhexa(tostring(args.Rid)) , args.Token)
+		return
+	end
+
+	--登陆成功 TODO 加载玩家相关数据
 
 	send_2_client(Player.fd, "EnterGameRes", EnterGameRes)
 end
 
 function Player.ChatListReq(args)
-	--验证是否已经登录成功
-	local chat_info = skynet.call("chat", "lua", "GetChatList")
+	local chat_info = skynet.call("chatservice", "lua", "GetChatList")
 	ChatListRes.MsgList = chat_info
 	send_2_client(Player.fd, "ChatListRes", ChatListRes)
 end
 
-function Player.BroadCastNtc(fd, msg_name, args)
-	skynet.error("---BroadCastNtc---", msg_name, args)
+function Player.broadcast_info(fd, msg_name, args)
+	filelog.sys_info("---broadcast_info---", msg_name, args)
 	if msg_name == "ChatNtc" then
 		ChatNtc.Rid = args.Rid
 		ChatNtc.Msg = args.Msg
@@ -58,7 +84,8 @@ function Player.BroadCastNtc(fd, msg_name, args)
 end
 
 function Player.ChatReq(args)
-	skynet.send("chat", "lua", "chat",args)
+	args.Rid = Player.Rid
+	skynet.send("chatservice", "lua", "chat", args)
 	send_2_client(Player.fd, "ChatRes", ChatRes)--默认值
 	
 	--广播所以人

@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local json = require "cjson"
-
+local filelog = require "filelog"
 local PlayerdataDAO = {}
 
 function PlayerdataDAO.query_player_register(name)
@@ -12,7 +12,9 @@ function PlayerdataDAO.query_player_register(name)
 		rediscmdopt1 = "info",
 	}
 
-	local result, data = skynet.call("dbmanagerserver", "lua", "query", requestmsg)
+	filelog.sys_info("-----query_player_register-----1")
+	local result, data = skynet.call(".dbmanagerservice", "lua", "query", requestmsg)
+	filelog.sys_info("-----query_player_register-----2")
 	if data ~= nil then
 		return result, json.decode(data)
 	end
@@ -28,7 +30,7 @@ function PlayerdataDAO.get_new_rid()
 		rediskey = "rid_max",
 	}
 
-	local _, rid_max = skynet.call("dbmanager", "lua", "query", requestmsg)
+	local _, rid_max = skynet.call(".dbmanagerservice", "lua", "query", requestmsg)
 	return rid_max
 end
 
@@ -43,7 +45,7 @@ function PlayerdataDAO.save_new_player_register(info)
 		rediscmdopt2 = json.encode(info),
 	}
 
-	skynet.send("dbmanager", "lua", "update", noticemsg)
+	skynet.send(".dbmanagerservice", "lua", "update", noticemsg)
 end
 
 return PlayerdataDAO

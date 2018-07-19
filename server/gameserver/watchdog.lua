@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local player = require "player"
+require "skynet.manager"
 
 local gate
 local CMD = {}
@@ -7,13 +7,11 @@ local SOCKET = {}
 local agents = {}
 
 
-function close(fd)
-
+local function close(fd)
 	local a = agents[fd]
 	agents[fd] = nil
 	if a then
 		skynet.call(gate, "lua", "kick", fd)
-		-- disconnect never return
 		skynet.send(a, "lua", "kick")
 	end
 end
@@ -56,9 +54,8 @@ end
 
 --广播数据
 function CMD.broadcast_info(msg_name, args)
-	skynet.error("---broadcast_info----",msg_name, args)
-	for fd,_ in pairs(agents) do
-		player.BroadCastNtc(fd, msg_name, args)
+	for fd, curent_agent in pairs(agents) do
+		skynet.send(curent_agent, "lua", "broadcast_info", fd, msg_name, args)
 	end
 end
 
@@ -74,6 +71,7 @@ skynet.start(function()
 		end
 	end)
 
+	skynet.register("watchdog")
 	gate = skynet.newservice("gate")
 end)
 

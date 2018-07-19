@@ -8,7 +8,7 @@ function FileLog.sys_info(...)
     if not skynet.getenv("info") == "false" then
         return
     end
-	skynet.send(".loggerserver", "lua", "info", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+	skynet.send(".loggerservice", "lua", "info", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 
@@ -17,7 +17,7 @@ function FileLog.sys_warning(...)
         return
     end
 
-    skynet.send(".loggerserver", "lua", "warning", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+    skynet.send(".loggerservice", "lua", "warning", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 
@@ -25,14 +25,14 @@ function FileLog.sys_error(...)
     if not skynet.getenv("error") == "false" then
         return
     end
-	skynet.send(".loggerserver", "lua", "error", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+	skynet.send(".loggerservice", "lua", "error", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 function FileLog.sys_db_info(...)
     if not skynet.getenv("info") == "false" then
         return
     end
-    skynet.send(".loggerserver", "lua", "db_info", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+    skynet.send(".loggerservice", "lua", "db_info", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 
@@ -45,12 +45,12 @@ function FileLog.sys_protomsg(msgname,...)
         return
     end
 
-    skynet.send(".loggerserver", "lua", "protomsg", msgname, "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+    skynet.send(".loggerservice", "lua", "protomsg", msgname, "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 
 function FileLog.stack_traceback(...)
-    skynet.send(".loggerserver", "lua", "stack_traceback", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
+    skynet.send(".loggerservice", "lua", "stack_traceback", "servicename:"..SERVICE_NAME.." service_id:"..skynet.self(), ...)
 end
 
 return FileLog

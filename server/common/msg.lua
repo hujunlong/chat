@@ -9,26 +9,33 @@ RegisterReq = {
 }
 
 RegisterResult = {
-	Status = 0,--0:ok 1:已经存在相同名字
+	Errcode = 0,
+	Errcodedes = "",
 }
 
 LoginReq = {
 	UserName = "",
 	Pwd = "",
 }
+
 LoginResult = {
-	Status = 0,--0:ok 1:用户名与密码不匹配 2:该账户未注册
+	Errcode = 0,
+	Errcodedes = "",
 	Rid = 0,--注册的rid
-	token = "",
+	Token = "",
+	Ip = "192.168.0.38",
+	Port=8888,
 }
 
 ------------------------
 EnterGameReq = {
 	Rid = 0,
+	Token = "",
 }
 
 EnterGameRes = {
-	Status = 0,--0:ok 1:账号服务器未通知
+	Errcode = 0,
+	Errcodedes = "",
 }
 
 --聊天列表
@@ -37,17 +44,20 @@ ChatListReq = {
 }
 
 ChatListRes = {
+	Errcode = 0,
+	Errcodedes = "",
 	MsgList = {},
 }
 
 --聊天
 ChatReq = {
-	Rid = 0,
 	Msg = "",
 }
 
 ChatRes = {
-	Status = 0, --成功
+	Errcode = 0,
+	Errcodedes = "",
+	 
 }
 
 ChatNtc = {

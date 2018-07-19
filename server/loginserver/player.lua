@@ -4,11 +4,14 @@ local json = require "cjson"
 local playerdatadao = require "playerdatadao"
 local md5 = require "md5"
 local filelog = require "filelog"
+require "enum"
 require "msg"
 
 local Head = Head
 local RegisterResult = RegisterResult
 local LoginResult = LoginResult
+
+local EErrCode = EErrCode
 
 local Player = {
 }
@@ -28,13 +31,13 @@ local function send_2_client(fd, package_name, data)
 end
 
 function Player.RegisterReq(fd, args)
-	local _, data = playerdatadao.query_player_registe(args.UserName)
+	local _, data = playerdatadao.query_player_register(args.UserName)
 	if data == nil then
 		args.Rid = playerdatadao.get_new_rid()
 		playerdatadao.save_new_player_register(args)
-		RegisterResult.Status = 0
 	else
-		RegisterResult.Status = 1	 
+		RegisterResult.Errcode = EErrCode.ERR_HAVE_SAME_NAME
+		RegisterResult.Errcodedes = "存在相同的名字,请重新注册！"
 	end
 	
 	send_2_client(fd, "RegisterResult", RegisterResult)
@@ -44,21 +47,23 @@ function Player.LoginReq(fd, args)
 	local status, data = playerdatadao.query_player_register(args.UserName)
 	if status and data then
 		if (data.UserName == args.UserName) and (data.Pwd == args.Pwd) then
-			LoginResult.Status = 0
 			LoginResult.Rid = data.Rid
 			LoginResult.Token = md5.sumhexa(tostring(data.Rid))
-			filelog.sys_info("---LoginReq---", data.Rid, data.UserName, data.Pwd, LoginResult.Token)
-
+			 
+			send_2_client(fd, "LoginResult", LoginResult)
+			
 			--断开连接
 			skynet.send("watchdog", "lua", "socket", "close", fd)
 		else
-			LoginResult.status = 1
+			LoginResult.Errcode = EErrCode.ERR_NAME_OR_PASSWD
+			LoginResult.Errcodedes = "数据库未查询到对应的用户与密码,请核对！"
 		end
 	else
-		LoginResult.status = 2	
+		LoginResult.Errcode = EErrCode.ERR_NAME_OR_PASSWD
+		LoginResult.Errcodedes = "数据库查询失败"
+		send_2_client(fd, "LoginResult", LoginResult)
 	end
-	
-	send_2_client(fd, "LoginResult", RegisterResult)
+
 end
 
 return Player

@@ -101,7 +101,7 @@ function CMD.db_info(...)
 end
 
 skynet.start(function()
-	skynet.register(".loggerserver")
+	skynet.register(".loggerservice")
 
     skynet.dispatch("lua", function(_,_, command, ...)
       
