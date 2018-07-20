@@ -50,4 +50,11 @@ function utility.is_file_exist(path)
   return file ~= nil
 end
 
+function utility.trim(input)
+    if input == nil then return "" end
+
+    input = string.gsub(input, "^[ \t\n\r]+", "")
+    return string.gsub(input, "[ \t\n\r]+$", "")
+end
+
 return utility

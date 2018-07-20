@@ -3,6 +3,7 @@ local socket = require "socket"
 local json = require "cjson"
 local filelog = require "filelog"
 local md5 = require "md5"
+local utility = require "utility"
 require "msg"
 require "enum"
 
@@ -53,7 +54,7 @@ function Player.EnterGameReq(args)
 		return
 	end
 
-	if md5.sumhexa(tostring(args.Rid)) ~= args.Token then
+	if md5.sumhexa(tostring(args.Rid)) ~= utility.trim(args.Token) then
 		EnterGameRes.Errcode = EErrCode.ERR_VERIFYTOKEN_FAILED
 		EnterGameRes.Errcodedes = "token 验证失败"
 		send_2_client(Player.fd, "EnterGameRes", EnterGameRes)
@@ -64,7 +65,8 @@ function Player.EnterGameReq(args)
 	end
 
 	--登陆成功 TODO 加载玩家相关数据
-
+	Player.Rid = args.Rid
+	
 	send_2_client(Player.fd, "EnterGameRes", EnterGameRes)
 end
 
