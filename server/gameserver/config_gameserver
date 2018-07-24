@@ -1,6 +1,6 @@
 root = "../../lib/skynet/"
 thread = 8
-logger = nil
+logger = "systemlog"
 logpath = "."
 harbor = 0
 start = "main"	-- main script
@@ -11,7 +11,7 @@ snax = root.."examples/?.lua;"
 cpath = root.."cservice/?.so"
 lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;" .. "./?.lua;" .. "../common/?.lua;" .. "../service/?.lua;"
 lua_cpath = root .. "luaclib/?.so;" .. root .. "3rd/pbc/binding/lua53/?.so"
-
+daemon = "./skynet.pid"
 db_connet_num = 10
 
 cluster = "../common/clustername.lua"

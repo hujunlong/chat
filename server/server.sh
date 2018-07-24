@@ -91,12 +91,16 @@ function server::start
 
   for ((_cnt = 1; _cnt < ${var_max_try}; _cnt++)); do
       server::is_alive "$var_skynet config_${@}" && break
-      eval "$var_skynet config_${@} &"
-      break
+      eval "$var_skynet config_${@}"
+      sleep 0.5
   done
 
   #sleep 1秒方便打印消息
-  sleep 1
+  sleep 0.5
+
+  if [ -f "${_dir}systemlog" ]; then
+     tail -25 "${_dir}systemlog"
+  fi
 
   if [ ! $_cnt -eq ${var_max_try} ]; then
     io::green "[$@] start succeed\r\n"
